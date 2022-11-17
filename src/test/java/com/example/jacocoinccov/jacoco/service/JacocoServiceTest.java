@@ -12,11 +12,11 @@ import java.io.IOException;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
-class DevOpsServiceTest {
-    private static final String clonePath = "clone";
+class JacocoServiceTest {
+    private static final String clonePath = "/Users/wanggang424/IdeaProjects/jacoco-inc-cov/clone";
 
     @Resource
-    DevOpsService devOpsService;
+    JacocoService jacocoService;
 
     @Test
     void getDiffByVersion() {
@@ -30,7 +30,7 @@ class DevOpsServiceTest {
     void testClone() throws IOException {
         org.springframework.core.io.Resource resource = new ClassPathResource("local.yaml");
         Dict local = YamlUtil.loadByPath(resource.getFile().getPath());
-        devOpsService.clone(clonePath,
+        jacocoService.clone(clonePath,
                 Constant.GIT_PATH,
                 local.getStr("name"),
                 local.getStr("password"),
@@ -42,6 +42,14 @@ class DevOpsServiceTest {
     void testCompile() throws IOException {
         testClone();
         String pomPath = clonePath + File.separator + "pom.xml";
-        devOpsService.compile(pomPath, Constant.MAVEN_HOME, Constant.COMPILE_PARAM);
+        jacocoService.compile(pomPath, Constant.MAVEN_HOME, Constant.COMPILE_PARAM);
+    }
+
+    @Test
+    void testDump() throws IOException {
+        String localPath = clonePath + File.separator + "dump";
+        String ip = "0.0.0.0";
+        int port = 0;
+        jacocoService.dump(localPath, ip, port);
     }
 }
