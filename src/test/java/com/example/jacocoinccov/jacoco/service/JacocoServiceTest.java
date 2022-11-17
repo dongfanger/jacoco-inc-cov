@@ -49,7 +49,7 @@ class JacocoServiceTest {
     void testDump() throws IOException {
         String localPath = clonePath + File.separator + "dump";
         String ip = "0.0.0.0";
-        int port = 0;
+        int port = 2014;
         jacocoService.dump(localPath, ip, port);
     }
 }

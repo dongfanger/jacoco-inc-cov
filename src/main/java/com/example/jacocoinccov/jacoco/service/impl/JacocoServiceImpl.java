@@ -93,7 +93,7 @@ public class JacocoServiceImpl implements JacocoService {
         }
         FileOutputStream localFile = new FileOutputStream(localPath + File.separator + "jacoco.exec");
         ExecutionDataWriter localWriter = new ExecutionDataWriter(localFile);
-        SocketAddress socketAddress = new InetSocketAddress(InetAddress.getByName(ip), port);
+        SocketAddress socketAddress = new InetSocketAddress(ip, port);
         Socket socket = new Socket();
         try {
             socket.connect(socketAddress, 10000);
