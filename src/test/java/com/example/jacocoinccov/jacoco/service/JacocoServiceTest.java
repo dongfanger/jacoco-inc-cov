@@ -14,6 +14,11 @@ import java.io.IOException;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 class JacocoServiceTest {
     private static final String clonePath = "/Users/wanggang424/IdeaProjects/jacoco-inc-cov/clone";
+    String dumpPath = clonePath + File.separator + "dump";
+    String classFilesPath = clonePath + File.separator + "target" + File.separator + "classes";
+    String reportPath = clonePath + File.separator + "report";
+    String srcPath = clonePath + File.separator + "src" + File.separator + "main" + File.separator + "java";
+
 
     @Resource
     JacocoService jacocoService;
@@ -47,9 +52,14 @@ class JacocoServiceTest {
 
     @Test
     void testDump() throws IOException {
-        String localPath = clonePath + File.separator + "dump";
         String ip = "0.0.0.0";
         int port = 2014;
-        jacocoService.dump(localPath, ip, port);
+        jacocoService.dump(dumpPath, ip, port);
+    }
+
+    @Test
+    void testReport() throws IOException {
+        testDump();
+        jacocoService.report(dumpPath, classFilesPath, srcPath, reportPath);
     }
 }

@@ -8,9 +8,17 @@ import org.eclipse.jgit.api.CheckoutCommand;
 import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
+import org.jacoco.core.analysis.Analyzer;
+import org.jacoco.core.analysis.CoverageBuilder;
+import org.jacoco.core.analysis.IBundleCoverage;
 import org.jacoco.core.data.ExecutionDataWriter;
 import org.jacoco.core.runtime.RemoteControlReader;
 import org.jacoco.core.runtime.RemoteControlWriter;
+import org.jacoco.core.tools.ExecFileLoader;
+import org.jacoco.report.DirectorySourceFileLocator;
+import org.jacoco.report.FileMultiReportOutput;
+import org.jacoco.report.IReportVisitor;
+import org.jacoco.report.html.HTMLFormatter;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -86,12 +94,12 @@ public class JacocoServiceImpl implements JacocoService {
     }
 
     @Override
-    public void dump(String localPath, String ip, int port) throws IOException {
-        localPath = FileUtil.getAbsolutePath(localPath);
-        if (!FileUtil.exist(localPath)) {
-            FileUtil.mkdir(localPath);
+    public void dump(String dumpPath, String ip, int port) throws IOException {
+        dumpPath = FileUtil.getAbsolutePath(dumpPath);
+        if (!FileUtil.exist(dumpPath)) {
+            FileUtil.mkdir(dumpPath);
         }
-        FileOutputStream localFile = new FileOutputStream(localPath + File.separator + "jacoco.exec");
+        FileOutputStream localFile = new FileOutputStream(dumpPath + File.separator + "jacoco.exec");
         ExecutionDataWriter localWriter = new ExecutionDataWriter(localFile);
         SocketAddress socketAddress = new InetSocketAddress(ip, port);
         Socket socket = new Socket();
@@ -115,5 +123,29 @@ public class JacocoServiceImpl implements JacocoService {
             localFile.close();
 
         }
+    }
+
+    @Override
+    public void report(String dumpPath, String classFilesPath, String srcPath, String reportPath) throws IOException {
+        dumpPath = FileUtil.getAbsolutePath(dumpPath);
+        classFilesPath = FileUtil.getAbsolutePath(classFilesPath);
+        srcPath = FileUtil.getAbsolutePath(srcPath);
+        reportPath = FileUtil.getAbsolutePath(reportPath);
+
+        File execFile = new File(dumpPath + File.separator + "jacoco.exec");
+        ExecFileLoader execFileLoader = new ExecFileLoader();
+        execFileLoader.load(execFile);
+
+        CoverageBuilder coverageBuilder = new CoverageBuilder();
+        Analyzer analyzer = new Analyzer(execFileLoader.getExecutionDataStore(), coverageBuilder);
+        analyzer.analyzeAll(new File(classFilesPath));
+        String reportTile = "增量覆盖率报告";
+        IBundleCoverage bundleCoverage = coverageBuilder.getBundle(reportTile);
+        HTMLFormatter htmlFormatter = new HTMLFormatter();
+        IReportVisitor iReportVisitor = htmlFormatter.createVisitor(new FileMultiReportOutput(new File(reportPath)));
+        iReportVisitor.visitInfo(execFileLoader.getSessionInfoStore().getInfos(), execFileLoader.getExecutionDataStore().getContents());
+        DirectorySourceFileLocator directorySourceFileLocator = new DirectorySourceFileLocator(new File(srcPath),"utf-8",4);
+        iReportVisitor.visitBundle(bundleCoverage, directorySourceFileLocator);
+        iReportVisitor.visitEnd();
     }
 }
