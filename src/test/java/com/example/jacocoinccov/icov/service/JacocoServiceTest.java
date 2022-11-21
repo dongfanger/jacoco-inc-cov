@@ -1,4 +1,4 @@
-package com.example.jacocoinccov.jacoco.service;
+package com.example.jacocoinccov.icov.service;
 
 import cn.hutool.core.lang.Dict;
 import cn.hutool.setting.yaml.YamlUtil;
@@ -39,8 +39,8 @@ class JacocoServiceTest {
                 Constant.GIT_PATH,
                 local.getStr("name"),
                 local.getStr("password"),
-                Constant.MAIN_BRANCH,
-                Constant.MAIN_VERSION_INIT);
+                Constant.TEST_BRANCH,
+                Constant.TEST_VERSION_2);
     }
 
     @Test

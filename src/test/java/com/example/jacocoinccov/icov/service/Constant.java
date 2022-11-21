@@ -1,4 +1,4 @@
-package com.example.jacocoinccov.jacoco.service;
+package com.example.jacocoinccov.icov.service;
 
 public class Constant {
     public static final String GIT_PATH = "https://github.com/dongfanger/jacoco-inc-cov-demo.git";

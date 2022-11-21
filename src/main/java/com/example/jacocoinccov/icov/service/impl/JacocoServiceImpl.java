@@ -1,7 +1,7 @@
-package com.example.jacocoinccov.jacoco.service.impl;
+package com.example.jacocoinccov.icov.service.impl;
 
 import cn.hutool.core.io.FileUtil;
-import com.example.jacocoinccov.jacoco.service.JacocoService;
+import com.example.jacocoinccov.icov.service.JacocoService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.maven.shared.invoker.*;
 import org.eclipse.jgit.api.CheckoutCommand;
@@ -22,10 +22,8 @@ import org.jacoco.report.html.HTMLFormatter;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;

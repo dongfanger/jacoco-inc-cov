@@ -1,6 +1,5 @@
-package com.example.jacocoinccov.jacoco.service;
+package com.example.jacocoinccov.icov.service;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public interface JacocoService {
