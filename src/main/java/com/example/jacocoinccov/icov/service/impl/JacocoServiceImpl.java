@@ -1,6 +1,8 @@
 package com.example.jacocoinccov.icov.service.impl;
 
 import cn.hutool.core.io.FileUtil;
+import com.example.jacocoinccov.icov.bean.ReportInfo;
+import com.example.jacocoinccov.icov.enums.ReportTypeEnum;
 import com.example.jacocoinccov.icov.service.JacocoService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.maven.shared.invoker.*;
@@ -12,6 +14,7 @@ import org.jacoco.core.analysis.Analyzer;
 import org.jacoco.core.analysis.CoverageBuilder;
 import org.jacoco.core.analysis.IBundleCoverage;
 import org.jacoco.core.data.ExecutionDataWriter;
+import org.jacoco.core.internal.diff.GitAdapter;
 import org.jacoco.core.runtime.RemoteControlReader;
 import org.jacoco.core.runtime.RemoteControlWriter;
 import org.jacoco.core.tools.ExecFileLoader;
@@ -32,16 +35,6 @@ import java.util.Collections;
 @Service
 @Slf4j
 public class JacocoServiceImpl implements JacocoService {
-    @Override
-    public String getDiffByVersion(String branchName, String newVersion, String oldVersion) {
-        return null;
-    }
-
-    @Override
-    public String getDiffByBranch(String newBranchName, String oldBranchName) {
-        return null;
-    }
-
     @Override
     public void clone(String localPath, String gitPath, String username, String password, String branchName, String version) {
         localPath = FileUtil.getAbsolutePath(localPath);
@@ -86,7 +79,7 @@ public class JacocoServiceImpl implements JacocoService {
             log.info("编译失败:{}", e.getMessage());
             return;
         }
-        if ( result.getExitCode() != 0 || result.getExecutionException() != null ) {
+        if (result.getExitCode() != 0 || result.getExecutionException() != null) {
             log.info("编译失败:{}", result.getExecutionException().getMessage());
         }
     }
@@ -119,12 +112,11 @@ public class JacocoServiceImpl implements JacocoService {
         } finally {
             socket.close();
             localFile.close();
-
         }
     }
 
     @Override
-    public void report(String dumpPath, String classFilesPath, String srcPath, String reportPath) throws IOException {
+    public void report(String dumpPath, String classFilesPath, String srcPath, String reportPath, ReportInfo reportInfo) throws IOException {
         dumpPath = FileUtil.getAbsolutePath(dumpPath);
         classFilesPath = FileUtil.getAbsolutePath(classFilesPath);
         srcPath = FileUtil.getAbsolutePath(srcPath);
@@ -134,7 +126,18 @@ public class JacocoServiceImpl implements JacocoService {
         ExecFileLoader execFileLoader = new ExecFileLoader();
         execFileLoader.load(execFile);
 
+        if (reportInfo != null && !reportInfo.getGitUsername().isEmpty()) {
+            GitAdapter.setCredentialsProvider(reportInfo.getGitUsername(), reportInfo.getGitPassword());
+        }
+
         CoverageBuilder coverageBuilder = new CoverageBuilder();
+        if (reportInfo != null && ReportTypeEnum.BRANCH.getType() == (reportInfo.type)) {
+            coverageBuilder = new CoverageBuilder(reportInfo.gitPath, reportInfo.newBranchName, reportInfo.oldBranchName);
+        }
+        if (reportInfo != null && ReportTypeEnum.VERSION.getType() == (reportInfo.type)) {
+            coverageBuilder = new CoverageBuilder(reportInfo.gitPath, reportInfo.branchName, reportInfo.newVersion, reportInfo.oldVersion);
+        }
+
         Analyzer analyzer = new Analyzer(execFileLoader.getExecutionDataStore(), coverageBuilder);
         analyzer.analyzeAll(new File(classFilesPath));
         String reportTile = "增量覆盖率报告";
@@ -142,7 +145,7 @@ public class JacocoServiceImpl implements JacocoService {
         HTMLFormatter htmlFormatter = new HTMLFormatter();
         IReportVisitor iReportVisitor = htmlFormatter.createVisitor(new FileMultiReportOutput(new File(reportPath)));
         iReportVisitor.visitInfo(execFileLoader.getSessionInfoStore().getInfos(), execFileLoader.getExecutionDataStore().getContents());
-        DirectorySourceFileLocator directorySourceFileLocator = new DirectorySourceFileLocator(new File(srcPath),"utf-8",4);
+        DirectorySourceFileLocator directorySourceFileLocator = new DirectorySourceFileLocator(new File(srcPath), "utf-8", 4);
         iReportVisitor.visitBundle(bundleCoverage, directorySourceFileLocator);
         iReportVisitor.visitEnd();
     }

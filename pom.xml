@@ -55,14 +55,14 @@
 
         <dependency>
             <groupId>org.jacoco</groupId>
-            <artifactId>dongfanger-core</artifactId>
-            <version>1.0.0</version>
+            <artifactId>org.jacoco.core</artifactId>
+            <version>0.8.9</version>
         </dependency>
 
         <dependency>
             <groupId>org.jacoco</groupId>
-            <artifactId>dongfanger-report</artifactId>
-            <version>1.0.0</version>
+            <artifactId>org.jacoco.report</artifactId>
+            <version>0.8.9</version>
         </dependency>
 
     </dependencies>

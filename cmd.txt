@@ -1,0 +1,20 @@
+"/Applications/IntelliJ IDEA.app/Contents/plugins/maven/lib/maven3"/bin/mvn install:install-file -DgroupId=org.jacoco -DartifactId=local-core -Dversion=1.0.0 -Dpackaging=jar -Dmaven.test.skip=true -Dfile=lib/org.jacoco.core-0.8.4.201910110746.jar
+
+"/Applications/IntelliJ IDEA.app/Contents/plugins/maven/lib/maven3"/bin/mvn install:install-file -DgroupId=org.jacoco -DartifactId=local-report -Dversion=1.0.0 -Dpackaging=jar -Dmaven.test.skip=true -Dfile=lib/org.jacoco.report-0.8.4.201910110746.jar
+
+<dependency>
+    <groupId>org.jacoco</groupId>
+    <artifactId>local-core</artifactId>
+    <version>1.0.0</version>
+</dependency>
+
+<dependency>
+    <groupId>org.jacoco</groupId>
+    <artifactId>local-report</artifactId>
+    <version>1.0.0</version>
+</dependency>
+
+
+"/Applications/IntelliJ IDEA.app/Contents/plugins/maven/lib/maven3"/bin/mvn package
+
+java -javaagent:/Users/wanggang424/IdeaProjects/jacoco-inc-cov/src/main/resources/jacocoagent.jar=output=tcpserver,address=0.0.0.0,port=2014 -jar target/jacoco-inc-cov-demo-0.0.1-SNAPSHOT.jar
